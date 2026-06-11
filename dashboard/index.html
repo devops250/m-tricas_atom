@@ -177,7 +177,7 @@
 </main>
 
 <footer>
-  Cognita AI · Atualizado automaticamente a cada execução do workflow n8n · <span id="footerStamp"></span>
+  Cognita AI · Atualizado automaticamente · <span id="footerStamp"></span>
 </footer>
 
 <script>
@@ -210,9 +210,21 @@ function render() {
   const isDaily = STATE.period === 'daily';
   document.getElementById('generatedAt').textContent =
     'Gerado em ' + new Date(d.gerado_em).toLocaleString('pt-BR');
-  document.getElementById('periodLabel').textContent = isDaily
-    ? 'Diário · ' + d.data
-    : `Semanal · ${d.semana_inicio} a ${d.semana_fim}`;
+  // Mostra o intervalo coberto pelos dados, não só o último dia
+  let labelTexto;
+  if (isDaily) {
+    const datas = (d.historico || []).map(h => h.data).filter(Boolean).sort();
+    if (datas.length > 1) {
+      const fmt = s => s.split('-').reverse().slice(0,2).join('/');
+      labelTexto = `Período: ${fmt(datas[0])} → ${fmt(datas[datas.length-1])}`;
+    } else {
+      labelTexto = 'Diário · ' + d.data;
+    }
+  } else {
+    const fmt = s => s.split('-').reverse().slice(0,2).join('/');
+    labelTexto = `Semanal · ${fmt(d.semana_inicio)} → ${fmt(d.semana_fim)}`;
+  }
+  document.getElementById('periodLabel').textContent = labelTexto;
   document.getElementById('footerStamp').textContent = new Date(d.gerado_em).toLocaleString('pt-BR');
 
   renderFunnelKPIs(d);
