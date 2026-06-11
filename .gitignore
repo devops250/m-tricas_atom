@@ -1,0 +1,25 @@
+# Handover interno — contém credenciais e dados confidenciais
+*.docx
+Handover_*
+
+# Ambiente
+.env
+.env.*
+!.env.example
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Editores
+.vscode/
+.idea/
+*.swp
+
+# Claude Code local
+.claude/
+
+# Node (caso o dashboard ganhe build futuramente)
+node_modules/
+dist/
+.next/

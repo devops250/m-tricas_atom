@@ -1,0 +1,81 @@
+{
+  "gerado_em": "2026-06-11T07:00:00-03:00",
+  "data": "2026-06-10",
+  "periodo": "diario",
+  "funil": {
+    "disparos": 0,
+    "disparos_reativacao": 0,
+    "disparos_campanha": 0,
+    "falhas_envio": 0,
+    "respondidos": 0,
+    "em_qualificacao": 0,
+    "qualificados": 0,
+    "transferidos": 0,
+    "taxa_resposta": null,
+    "taxa_qualificacao": null,
+    "taxa_transferencia_disparos": null,
+    "taxa_transferencia_respostas": null
+  },
+  "performance_ia": {
+    "tempo_medio_1a_resposta_seg": null,
+    "msgs_por_conversa_media": null,
+    "msgs_por_conversa_p50": null,
+    "msgs_por_conversa_p90": null,
+    "tempo_medio_qualificacao_seg": null,
+    "midias_processadas": 0,
+    "audios_transcritos": 0,
+    "imagens_processadas": 0,
+    "taxa_fup_necessario": null,
+    "conversas_abandonadas": 0,
+    "resets_solicitados": 0
+  },
+  "mix": {
+    "interesse": {},
+    "conhecimento": {},
+    "objetivo": {}
+  },
+  "historico": [
+    {
+      "data": "2026-05-21",
+      "disparos": 14,
+      "respondidos": 4,
+      "qualificados": 1,
+      "transferidos": 1
+    },
+    {
+      "data": "2026-05-22",
+      "disparos": 14,
+      "respondidos": 3,
+      "qualificados": 1,
+      "transferidos": 1
+    },
+    {
+      "data": "2026-05-23",
+      "disparos": 0,
+      "respondidos": 2,
+      "qualificados": 0,
+      "transferidos": 0
+    },
+    {
+      "data": "2026-05-26",
+      "disparos": 28,
+      "respondidos": 8,
+      "qualificados": 3,
+      "transferidos": 2
+    },
+    {
+      "data": "2026-05-27",
+      "disparos": 28,
+      "respondidos": 6,
+      "qualificados": 2,
+      "transferidos": 2
+    },
+    {
+      "data": "2026-05-28",
+      "disparos": 14,
+      "respondidos": 3,
+      "qualificados": 2,
+      "transferidos": 2
+    }
+  ]
+}

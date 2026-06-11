@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>ATOM SDR — Métricas</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0b0e14;
+    --surface: #131822;
+    --surface-2: #1a2030;
+    --border: #232a3a;
+    --text: #e6e9f0;
+    --text-dim: #8b94a7;
+    --accent: #4f8cff;
+    --good: #34d399;
+    --warn: #fbbf24;
+    --bad: #f87171;
+    --radius: 10px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+  header {
+    padding: 24px 32px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  header h1 { margin: 0; font-size: 20px; font-weight: 600; }
+  header .sub { color: var(--text-dim); font-size: 13px; }
+  .tabs {
+    display: flex;
+    gap: 4px;
+    padding: 0 32px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .tab {
+    padding: 14px 20px;
+    cursor: pointer;
+    color: var(--text-dim);
+    border-bottom: 2px solid transparent;
+    font-size: 14px;
+    user-select: none;
+  }
+  .tab.active { color: var(--text); border-bottom-color: var(--accent); }
+  .controls {
+    padding: 16px 32px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+  .controls button {
+    background: var(--surface-2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 6px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+  }
+  .controls button.active { background: var(--accent); border-color: var(--accent); }
+  main { padding: 24px 32px; max-width: 1400px; margin: 0 auto; }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+  }
+  .card .label { color: var(--text-dim); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+  .card .value { font-size: 28px; font-weight: 600; line-height: 1; }
+  .card .delta { font-size: 12px; margin-top: 6px; color: var(--text-dim); }
+  .card .delta.up { color: var(--good); }
+  .card .delta.down { color: var(--bad); }
+  .card.kpi-funnel { border-left: 3px solid var(--accent); }
+  .charts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+    gap: 16px;
+  }
+  .chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; }
+  .chart-card h3 { margin: 0 0 14px; font-size: 14px; font-weight: 600; color: var(--text); }
+  .chart-card canvas { max-height: 280px; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+  footer { padding: 16px 32px; color: var(--text-dim); font-size: 12px; border-top: 1px solid var(--border); text-align: center; }
+  .empty { padding: 60px 20px; text-align: center; color: var(--text-dim); }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>ATOM SDR — Painel de Métricas</h1>
+    <div class="sub" id="generatedAt">Carregando…</div>
+  </div>
+  <div class="sub" id="periodLabel"></div>
+</header>
+
+<div class="tabs">
+  <div class="tab active" data-tab="funnel">Funil</div>
+  <div class="tab" data-tab="performance">Performance da IA</div>
+  <div class="tab" data-tab="history">Histórico</div>
+</div>
+
+<div class="controls">
+  <span style="color: var(--text-dim); font-size: 13px;">Período:</span>
+  <button class="active" data-period="daily">Diário</button>
+  <button data-period="weekly">Semanal</button>
+</div>
+
+<main>
+  <div id="panel-funnel" class="panel active">
+    <div class="grid" id="kpis-funnel"></div>
+    <div class="charts">
+      <div class="chart-card">
+        <h3>Funil de conversão</h3>
+        <canvas id="chartFunnel"></canvas>
+      </div>
+      <div class="chart-card">
+        <h3>Mix por origem (disparos)</h3>
+        <canvas id="chartOrigem"></canvas>
+      </div>
+      <div class="chart-card">
+        <h3>Mix de qualificação — Interesse</h3>
+        <canvas id="chartInteresse"></canvas>
+      </div>
+      <div class="chart-card">
+        <h3>Mix de qualificação — Conhecimento</h3>
+        <canvas id="chartConhecimento"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div id="panel-performance" class="panel">
+    <div class="grid" id="kpis-performance"></div>
+    <div class="charts">
+      <div class="chart-card">
+        <h3>Mídias processadas</h3>
+        <canvas id="chartMidias"></canvas>
+      </div>
+      <div class="chart-card">
+        <h3>Distribuição mensagens por conversa</h3>
+        <canvas id="chartMsgs"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div id="panel-history" class="panel">
+    <div class="chart-card" style="margin-bottom: 16px;">
+      <h3>Funil ao longo do tempo</h3>
+      <canvas id="chartHistFunnel"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3>Taxas (%) ao longo do tempo</h3>
+      <canvas id="chartHistTaxas"></canvas>
+    </div>
+  </div>
+</main>
+
+<footer>
+  Cognita AI · Atualizado automaticamente a cada execução do workflow n8n · <span id="footerStamp"></span>
+</footer>
+
+<script>
+const STATE = { period: 'daily', data: null, charts: {} };
+
+const pct = (v) => v == null ? '—' : (v * 100).toFixed(1) + '%';
+const num = (v) => v == null ? '—' : v.toLocaleString('pt-BR');
+const secsToHuman = (s) => {
+  if (s == null) return '—';
+  if (s < 60) return s + 's';
+  if (s < 3600) return Math.round(s / 60) + ' min';
+  return (s / 3600).toFixed(1) + ' h';
+};
+
+async function load(period) {
+  STATE.period = period;
+  const url = `./data/${period}.json?t=${Date.now()}`;
+  try {
+    const r = await fetch(url);
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    STATE.data = await r.json();
+    render();
+  } catch (e) {
+    document.getElementById('generatedAt').textContent = 'Erro ao carregar dados: ' + e.message;
+  }
+}
+
+function render() {
+  const d = STATE.data;
+  const isDaily = STATE.period === 'daily';
+  document.getElementById('generatedAt').textContent =
+    'Gerado em ' + new Date(d.gerado_em).toLocaleString('pt-BR');
+  document.getElementById('periodLabel').textContent = isDaily
+    ? 'Diário · ' + d.data
+    : `Semanal · ${d.semana_inicio} a ${d.semana_fim}`;
+  document.getElementById('footerStamp').textContent = new Date(d.gerado_em).toLocaleString('pt-BR');
+
+  renderFunnelKPIs(d);
+  renderPerformanceKPIs(d);
+  renderCharts(d);
+}
+
+function kpi(label, value, delta) {
+  let deltaHtml = '';
+  if (delta !== undefined && delta !== null) {
+    const cls = delta > 0 ? 'up' : delta < 0 ? 'down' : '';
+    const sign = delta > 0 ? '+' : '';
+    deltaHtml = `<div class="delta ${cls}">${sign}${delta}</div>`;
+  }
+  return `<div class="card kpi-funnel"><div class="label">${label}</div><div class="value">${value}</div>${deltaHtml}</div>`;
+}
+
+function renderFunnelKPIs(d) {
+  const f = d.funil;
+  const delta = d.delta_semana_anterior || {};
+  const root = document.getElementById('kpis-funnel');
+  root.innerHTML = [
+    kpi('Disparos', num(f.disparos), delta.disparos),
+    kpi('Respondidos', num(f.respondidos), null),
+    kpi('Qualificados', num(f.qualificados), delta.qualificados),
+    kpi('Transferidos', num(f.transferidos), delta.transferidos),
+    kpi('Taxa de resposta', pct(f.taxa_resposta), delta.taxa_resposta ? (delta.taxa_resposta * 100).toFixed(1) + 'pp' : null),
+    kpi('Taxa de qualificação', pct(f.taxa_qualificacao), delta.taxa_qualificacao ? (delta.taxa_qualificacao * 100).toFixed(1) + 'pp' : null),
+    kpi('Taxa de transferência (disparos)', pct(f.taxa_transferencia_disparos), null),
+    kpi('Falhas de envio', num(f.falhas_envio), null),
+  ].join('');
+}
+
+function renderPerformanceKPIs(d) {
+  const p = d.performance_ia;
+  const root = document.getElementById('kpis-performance');
+  root.innerHTML = [
+    kpi('Tempo médio até 1ª resposta', secsToHuman(p.tempo_medio_1a_resposta_seg)),
+    kpi('Tempo médio até qualificação', secsToHuman(p.tempo_medio_qualificacao_seg)),
+    kpi('Msgs/conversa (média)', p.msgs_por_conversa_media ?? '—'),
+    kpi('Msgs/conversa (p90)', p.msgs_por_conversa_p90 ?? '—'),
+    kpi('Áudios transcritos', num(p.audios_transcritos ?? 0)),
+    kpi('Imagens processadas', num(p.imagens_processadas ?? 0)),
+    kpi('Conversas abandonadas', num(p.conversas_abandonadas ?? 0)),
+    kpi('Resets solicitados', num(p.resets_solicitados ?? 0)),
+  ].join('');
+}
+
+function destroyChart(key) {
+  if (STATE.charts[key]) { STATE.charts[key].destroy(); delete STATE.charts[key]; }
+}
+
+const chartDefaults = {
+  plugins: { legend: { labels: { color: '#e6e9f0' } } },
+  scales: {
+    x: { ticks: { color: '#8b94a7' }, grid: { color: '#232a3a' } },
+    y: { ticks: { color: '#8b94a7' }, grid: { color: '#232a3a' } }
+  }
+};
+
+function renderCharts(d) {
+  const f = d.funil;
+  destroyChart('funnel');
+  STATE.charts.funnel = new Chart(document.getElementById('chartFunnel'), {
+    type: 'bar',
+    data: {
+      labels: ['Disparos', 'Respondidos', 'Qualificados', 'Transferidos'],
+      datasets: [{
+        label: STATE.period === 'daily' ? d.data : `${d.semana_inicio}–${d.semana_fim}`,
+        data: [f.disparos, f.respondidos, f.qualificados, f.transferidos],
+        backgroundColor: ['#4f8cff', '#34d399', '#fbbf24', '#a78bfa']
+      }]
+    },
+    options: { ...chartDefaults, indexAxis: 'y' }
+  });
+
+  destroyChart('origem');
+  STATE.charts.origem = new Chart(document.getElementById('chartOrigem'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Reativação', 'Campanha'],
+      datasets: [{
+        data: [f.disparos_reativacao || 0, f.disparos_campanha || 0],
+        backgroundColor: ['#4f8cff', '#a78bfa']
+      }]
+    },
+    options: { plugins: { legend: { labels: { color: '#e6e9f0' } } } }
+  });
+
+  const mix = d.mix || {};
+  renderMixChart('interesse', mix.interesse || {}, 'chartInteresse');
+  renderMixChart('conhecimento', mix.conhecimento || {}, 'chartConhecimento');
+
+  const p = d.performance_ia;
+  destroyChart('midias');
+  STATE.charts.midias = new Chart(document.getElementById('chartMidias'), {
+    type: 'bar',
+    data: {
+      labels: ['Áudios (Whisper)', 'Imagens (Vision)'],
+      datasets: [{
+        data: [p.audios_transcritos || 0, p.imagens_processadas || 0],
+        backgroundColor: ['#34d399', '#fbbf24']
+      }]
+    },
+    options: { ...chartDefaults, plugins: { legend: { display: false } } }
+  });
+
+  destroyChart('msgs');
+  STATE.charts.msgs = new Chart(document.getElementById('chartMsgs'), {
+    type: 'bar',
+    data: {
+      labels: ['Média', 'p50', 'p90'],
+      datasets: [{
+        data: [p.msgs_por_conversa_media || 0, p.msgs_por_conversa_p50 || 0, p.msgs_por_conversa_p90 || 0],
+        backgroundColor: '#4f8cff'
+      }]
+    },
+    options: { ...chartDefaults, plugins: { legend: { display: false } } }
+  });
+
+  const hist = STATE.period === 'daily' ? (d.historico || []) : (d.historico_semanal || []);
+  const labels = hist.map(h => h.data || h.semana_inicio);
+  destroyChart('histFunnel');
+  STATE.charts.histFunnel = new Chart(document.getElementById('chartHistFunnel'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Disparos', data: hist.map(h => h.disparos), borderColor: '#4f8cff', tension: 0.3 },
+        { label: 'Respondidos', data: hist.map(h => h.respondidos), borderColor: '#34d399', tension: 0.3 },
+        { label: 'Qualificados', data: hist.map(h => h.qualificados), borderColor: '#fbbf24', tension: 0.3 },
+        { label: 'Transferidos', data: hist.map(h => h.transferidos), borderColor: '#a78bfa', tension: 0.3 }
+      ]
+    },
+    options: chartDefaults
+  });
+
+  destroyChart('histTaxas');
+  const taxaResp = hist.map(h => h.taxa_resposta != null ? (h.taxa_resposta * 100).toFixed(1) : (h.disparos ? (h.respondidos / h.disparos * 100).toFixed(1) : null));
+  const taxaQual = hist.map(h => h.taxa_qualificacao != null ? (h.taxa_qualificacao * 100).toFixed(1) : (h.respondidos ? (h.qualificados / h.respondidos * 100).toFixed(1) : null));
+  STATE.charts.histTaxas = new Chart(document.getElementById('chartHistTaxas'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Taxa de resposta (%)', data: taxaResp, borderColor: '#34d399', tension: 0.3 },
+        { label: 'Taxa de qualificação (%)', data: taxaQual, borderColor: '#fbbf24', tension: 0.3 }
+      ]
+    },
+    options: chartDefaults
+  });
+}
+
+function renderMixChart(key, obj, canvasId) {
+  destroyChart(key);
+  const labels = Object.keys(obj);
+  const data = Object.values(obj);
+  STATE.charts[key] = new Chart(document.getElementById(canvasId), {
+    type: 'doughnut',
+    data: {
+      labels: labels.length ? labels : ['Sem dados'],
+      datasets: [{
+        data: data.length ? data : [1],
+        backgroundColor: ['#4f8cff', '#34d399', '#fbbf24', '#a78bfa', '#f87171']
+      }]
+    },
+    options: { plugins: { legend: { labels: { color: '#e6e9f0' } } } }
+  });
+}
+
+// Tabs
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById('panel-' + t.dataset.tab).classList.add('active');
+  });
+});
+
+// Period switch
+document.querySelectorAll('.controls button').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('.controls button').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    load(b.dataset.period);
+  });
+});
+
+load('daily');
+</script>
+</body>
+</html>
