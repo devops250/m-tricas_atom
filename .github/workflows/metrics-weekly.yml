@@ -1,0 +1,62 @@
+name: Métricas SDR — Semanal
+
+on:
+  schedule:
+    # 08:00 BRT segunda-feira (11:00 UTC seg)
+    - cron: '0 11 * * 1'
+  workflow_dispatch:
+    inputs:
+      semana_inicio:
+        description: 'Segunda-feira da semana (YYYY-MM-DD) — opcional, default: semana passada'
+        required: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: metrics-weekly
+  cancel-in-progress: false
+
+jobs:
+  weekly:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Calcular janela da semana passada (seg→dom em BRT)
+        id: janela
+        run: |
+          if [ -n "${{ inputs.semana_inicio }}" ]; then
+            INI="${{ inputs.semana_inicio }}"
+          else
+            # Última segunda-feira encerrada (sempre 7 dias atrás se rodar numa segunda)
+            INI=$(TZ='America/Sao_Paulo' date -d 'last monday -7 days' +%Y-%m-%d)
+          fi
+          FIM=$(date -d "$INI +6 days" +%Y-%m-%d)
+          echo "inicio=$INI" >> "$GITHUB_OUTPUT"
+          echo "fim=$FIM"    >> "$GITHUB_OUTPUT"
+          echo "Semana: $INI → $FIM"
+
+      - name: Rodar backfill da semana
+        env:
+          CHATWOOT_TOKEN: ${{ secrets.CHATWOOT_TOKEN }}
+          NOCODB_TOKEN:   ${{ secrets.NOCODB_TOKEN }}
+        run: node scripts/backfill.mjs "${{ steps.janela.outputs.inicio }}" "${{ steps.janela.outputs.fim }}"
+
+      - name: Commit & push se houve mudança
+        run: |
+          git config user.name  "metricas-bot"
+          git config user.email "metricas-bot@users.noreply.github.com"
+          git add dashboard/data/daily.json dashboard/data/weekly.json
+          if git diff --cached --quiet; then
+            echo "Sem mudanças nos JSONs"
+          else
+            git commit -m "chore(metrics): semanal ${{ steps.janela.outputs.inicio }}→${{ steps.janela.outputs.fim }}"
+            git push
+          fi
