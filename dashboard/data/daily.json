@@ -1,81 +1,92 @@
 {
-  "gerado_em": "2026-06-11T07:00:00-03:00",
-  "data": "2026-06-10",
+  "gerado_em": "2026-06-11T22:59:34.679Z",
+  "data": "2026-06-11",
   "periodo": "diario",
   "funil": {
-    "disparos": 0,
-    "disparos_reativacao": 0,
+    "disparos": 600,
+    "disparos_reativacao": 600,
     "disparos_campanha": 0,
     "falhas_envio": 0,
-    "respondidos": 0,
-    "em_qualificacao": 0,
-    "qualificados": 0,
-    "transferidos": 0,
-    "taxa_resposta": null,
-    "taxa_qualificacao": null,
-    "taxa_transferencia_disparos": null,
-    "taxa_transferencia_respostas": null
+    "respondidos": 147,
+    "em_qualificacao": 575,
+    "qualificados": 26,
+    "desqualificados": 14,
+    "suporte": 7,
+    "transferidos": 33,
+    "taxa_resposta": 0.245,
+    "taxa_qualificacao": 0.1769,
+    "taxa_transferencia_disparos": 0.055,
+    "taxa_transferencia_respostas": 0.2245
   },
   "performance_ia": {
-    "tempo_medio_1a_resposta_seg": null,
-    "msgs_por_conversa_media": null,
-    "msgs_por_conversa_p50": null,
-    "msgs_por_conversa_p90": null,
-    "tempo_medio_qualificacao_seg": null,
-    "midias_processadas": 0,
-    "audios_transcritos": 0,
-    "imagens_processadas": 0,
+    "tempo_medio_1a_resposta_seg": 19,
+    "msgs_por_conversa_media": 3.4,
+    "msgs_por_conversa_p50": 1,
+    "msgs_por_conversa_p90": 10,
+    "tempo_medio_qualificacao_seg": 16776,
+    "midias_processadas": 14,
+    "audios_transcritos": 11,
+    "imagens_processadas": 3,
     "taxa_fup_necessario": null,
     "conversas_abandonadas": 0,
     "resets_solicitados": 0
   },
   "mix": {
-    "interesse": {},
-    "conhecimento": {},
+    "interesse": {
+      "Consultoria": 13,
+      "Formação": 13
+    },
+    "conhecimento": {
+      "Intermediario": 12,
+      "Basico": 12,
+      "Avançado": 2
+    },
     "objetivo": {}
   },
   "historico": [
     {
-      "data": "2026-05-21",
-      "disparos": 14,
-      "respondidos": 4,
-      "qualificados": 1,
-      "transferidos": 1
-    },
-    {
-      "data": "2026-05-22",
-      "disparos": 14,
-      "respondidos": 3,
-      "qualificados": 1,
-      "transferidos": 1
-    },
-    {
-      "data": "2026-05-23",
-      "disparos": 0,
+      "data": "2026-06-08",
+      "disparos": 148,
       "respondidos": 2,
-      "qualificados": 0,
-      "transferidos": 0
+      "qualificados": 5,
+      "desqualificados": 5,
+      "suporte": 1,
+      "transferidos": 10,
+      "taxa_resposta": 0.0135,
+      "taxa_qualificacao": 2.5
     },
     {
-      "data": "2026-05-26",
-      "disparos": 28,
-      "respondidos": 8,
-      "qualificados": 3,
-      "transferidos": 2
+      "data": "2026-06-09",
+      "disparos": 260,
+      "respondidos": 25,
+      "qualificados": 13,
+      "desqualificados": 9,
+      "suporte": 1,
+      "transferidos": 14,
+      "taxa_resposta": 0.0962,
+      "taxa_qualificacao": 0.52
     },
     {
-      "data": "2026-05-27",
-      "disparos": 28,
-      "respondidos": 6,
-      "qualificados": 2,
-      "transferidos": 2
+      "data": "2026-06-10",
+      "disparos": 599,
+      "respondidos": 167,
+      "qualificados": 28,
+      "desqualificados": 20,
+      "suporte": 2,
+      "transferidos": 30,
+      "taxa_resposta": 0.2788,
+      "taxa_qualificacao": 0.1677
     },
     {
-      "data": "2026-05-28",
-      "disparos": 14,
-      "respondidos": 3,
-      "qualificados": 2,
-      "transferidos": 2
+      "data": "2026-06-11",
+      "disparos": 600,
+      "respondidos": 147,
+      "qualificados": 26,
+      "desqualificados": 14,
+      "suporte": 7,
+      "transferidos": 33,
+      "taxa_resposta": 0.245,
+      "taxa_qualificacao": 0.1769
     }
   ]
 }

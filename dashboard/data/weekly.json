@@ -1,33 +1,42 @@
 {
-  "gerado_em": "2026-06-08T08:00:00-03:00",
-  "semana_inicio": "2026-06-01",
-  "semana_fim": "2026-06-07",
+  "gerado_em": "2026-06-11T22:59:34.679Z",
+  "semana_inicio": "2026-06-08",
+  "semana_fim": "2026-06-11",
   "periodo": "semanal",
   "funil": {
-    "disparos": 0,
-    "disparos_reativacao": 0,
+    "disparos": 1607,
+    "disparos_reativacao": 1607,
     "disparos_campanha": 0,
     "falhas_envio": 0,
-    "respondidos": 0,
-    "qualificados": 0,
-    "transferidos": 0,
-    "taxa_resposta": null,
-    "taxa_qualificacao": null,
-    "taxa_transferencia_disparos": null,
-    "taxa_transferencia_respostas": null
+    "respondidos": 341,
+    "qualificados": 72,
+    "desqualificados": 48,
+    "suporte": 11,
+    "transferidos": 87,
+    "taxa_resposta": 0.2122,
+    "taxa_qualificacao": 0.2111,
+    "taxa_transferencia_disparos": 0.0541,
+    "taxa_transferencia_respostas": 0.2551
   },
   "performance_ia": {
-    "tempo_medio_1a_resposta_seg": null,
-    "msgs_por_conversa_media": null,
-    "msgs_por_conversa_p90": null,
-    "tempo_medio_qualificacao_seg": null,
-    "midias_processadas": 0,
+    "tempo_medio_1a_resposta_seg": 18,
+    "msgs_por_conversa_media": 3.95,
+    "msgs_por_conversa_p90": 20,
+    "tempo_medio_qualificacao_seg": 15959,
+    "midias_processadas": 22,
     "taxa_fup_necessario": null,
-    "conversas_abandonadas": 0
+    "conversas_abandonadas": 40
   },
   "mix": {
-    "interesse": {},
-    "conhecimento": {},
+    "interesse": {
+      "Formação": 44,
+      "Consultoria": 27
+    },
+    "conhecimento": {
+      "Basico": 31,
+      "Intermediario": 27,
+      "Avançado": 13
+    },
     "objetivo": {}
   },
   "delta_semana_anterior": {
@@ -40,26 +49,15 @@
   },
   "historico_semanal": [
     {
-      "semana_inicio": "2026-05-18",
-      "semana_fim": "2026-05-24",
-      "disparos": 28,
-      "respondidos": 9,
-      "qualificados": 2,
-      "transferidos": 2,
-      "taxa_resposta": 0.3214,
-      "taxa_qualificacao": 0.2222,
-      "taxa_transferencia_disparos": 0.0714
-    },
-    {
-      "semana_inicio": "2026-05-25",
-      "semana_fim": "2026-05-31",
-      "disparos": 70,
-      "respondidos": 17,
-      "qualificados": 7,
-      "transferidos": 6,
-      "taxa_resposta": 0.2429,
-      "taxa_qualificacao": 0.4118,
-      "taxa_transferencia_disparos": 0.0857
+      "semana_inicio": "2026-06-08",
+      "semana_fim": "2026-06-11",
+      "disparos": 1607,
+      "respondidos": 341,
+      "qualificados": 72,
+      "transferidos": 87,
+      "taxa_resposta": 0.2122,
+      "taxa_qualificacao": 0.2111,
+      "taxa_transferencia_disparos": 0.0541
     }
   ]
 }
