@@ -132,10 +132,6 @@
     <div class="grid" id="kpis-funnel"></div>
     <div class="charts">
       <div class="chart-card">
-        <h3>Funil de conversão</h3>
-        <canvas id="chartFunnel"></canvas>
-      </div>
-      <div class="chart-card">
         <h3>Mix por origem (disparos)</h3>
         <canvas id="chartOrigem"></canvas>
       </div>
@@ -287,20 +283,6 @@ const chartDefaults = {
 
 function renderCharts(d) {
   const f = d.funil;
-  destroyChart('funnel');
-  STATE.charts.funnel = new Chart(document.getElementById('chartFunnel'), {
-    type: 'bar',
-    data: {
-      labels: ['Disparos', 'Respondidos', 'Qualificados', 'Transferidos'],
-      datasets: [{
-        label: STATE.period === 'daily' ? d.data : `${d.semana_inicio}–${d.semana_fim}`,
-        data: [f.disparos, f.respondidos, f.qualificados, f.transferidos],
-        backgroundColor: ['#4f8cff', '#34d399', '#fbbf24', '#a78bfa']
-      }]
-    },
-    options: { ...chartDefaults, indexAxis: 'y' }
-  });
-
   destroyChart('origem');
   STATE.charts.origem = new Chart(document.getElementById('chartOrigem'), {
     type: 'doughnut',
