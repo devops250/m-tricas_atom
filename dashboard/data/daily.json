@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-06-12T02:33:54.982Z",
+  "gerado_em": "2026-06-12T02:45:34.096Z",
   "data": "2026-06-11",
   "periodo": "diario",
   "funil": {
@@ -12,11 +12,11 @@
     "qualificados": 26,
     "desqualificados": 14,
     "suporte": 7,
-    "transferidos": 33,
+    "transferidos": 26,
     "taxa_resposta": 0.245,
     "taxa_qualificacao": 0.1769,
-    "taxa_transferencia_disparos": 0.055,
-    "taxa_transferencia_respostas": 0.2245
+    "taxa_transferencia_disparos": 0.0433,
+    "taxa_transferencia_respostas": 0.1769
   },
   "performance_ia": {
     "tempo_medio_1a_resposta_seg": 19,
@@ -51,20 +51,20 @@
       "qualificados": 5,
       "desqualificados": 5,
       "suporte": 1,
-      "transferidos": 10,
+      "transferidos": 5,
       "taxa_resposta": 0.0135,
       "taxa_qualificacao": 2.5
     },
     {
       "data": "2026-06-09",
       "disparos": 260,
-      "respondidos": 24,
+      "respondidos": 25,
       "qualificados": 13,
       "desqualificados": 9,
       "suporte": 1,
-      "transferidos": 14,
-      "taxa_resposta": 0.0923,
-      "taxa_qualificacao": 0.5417
+      "transferidos": 13,
+      "taxa_resposta": 0.0962,
+      "taxa_qualificacao": 0.52
     },
     {
       "data": "2026-06-10",
@@ -73,7 +73,7 @@
       "qualificados": 28,
       "desqualificados": 20,
       "suporte": 2,
-      "transferidos": 30,
+      "transferidos": 27,
       "taxa_resposta": 0.2788,
       "taxa_qualificacao": 0.1677
     },
@@ -84,7 +84,7 @@
       "qualificados": 26,
       "desqualificados": 14,
       "suporte": 7,
-      "transferidos": 33,
+      "transferidos": 26,
       "taxa_resposta": 0.245,
       "taxa_qualificacao": 0.1769
     }

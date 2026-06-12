@@ -126,7 +126,17 @@ function aggregateDay(date, conversas, leads, msgsPorConv) {
   const qualifsDoDia      = leadsAtualizadosNoDia.filter(l => l.Status === 'Qualificado');
   const desqualifsDoDia   = leadsAtualizadosNoDia.filter(l => l.Status === 'Desqualificado');
   const suporteDoDia      = leadsAtualizadosNoDia.filter(l => l.Status === 'Suporte');
-  const transfDoDia       = leadsAtualizadosNoDia.filter(l => l.Transferido === true);
+  // Transferido só conta se: Transferido=true + Status=Qualificado + conversa no team "vendas" (id=1)
+  const TEAM_VENDAS_ID = 1;
+  const transfDoDia = leadsAtualizadosNoDia.filter(l => {
+    if (l.Transferido !== true) return false;
+    if (l.Status !== 'Qualificado') return false;
+    if (!l.ConversationId) return true; // sem conversation linkada, aceita pelo NocoDB
+    const conv = conversas.find(c => c.id === Number(l.ConversationId));
+    if (!conv) return true; // conversa não veio no fetch (fora da janela), aceita
+    const team = conv.meta?.team?.id ?? conv.team_id;
+    return team === TEAM_VENDAS_ID;
+  });
 
   const disparosReativacao = leadsDoDia.filter(l => l.Origem === 'Reativação').length;
   const disparosCampanha   = leadsDoDia.filter(l => l.Origem === 'Campanha').length;
