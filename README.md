@@ -1,6 +1,6 @@
 # ATOM SDR — Métricas
 
-Dashboard estático de métricas do SDR IA da ATOM. Coleta via script Node.js, agendamento via GitHub Actions, hospedagem na Vercel.
+Dashboard estático de métricas do SDR IA da ATOM. Workflow simples: roda comando local quando quer atualizar, git push, Vercel deploya.
 
 **Produção:** https://metricasatom.cognitaai.com.br · https://metricas-atom.vercel.app
 
@@ -11,22 +11,35 @@ Dashboard estático de métricas do SDR IA da ATOM. Coleta via script Node.js, a
 ├── dashboard/
 │   ├── index.html              # Single-file com Chart.js
 │   └── data/
-│       ├── daily.json          # Snapshot do dia (sobrescrito a cada execução)
+│       ├── daily.json          # Snapshot do dia
 │       └── weekly.json         # Snapshot da semana
-├── scripts/
-│   └── backfill.mjs            # Coleta NocoDB + Chatwoot e gera os JSONs
-└── cron/
-    ├── Dockerfile              # Container Node + node-cron
-    ├── scheduler.mjs           # Schedule diário + semanal, commita no Git
-    ├── package.json
-    └── README.md               # Instruções de deploy no EasyPanel
+└── scripts/
+    └── backfill.mjs            # Coleta NocoDB + Chatwoot e gera os JSONs
 ```
+
+## Como atualizar as métricas
+
+Roda local quando quiser. Sem cron, sem CI — você dispara.
+
+```bash
+# Janela arbitrária
+CHATWOOT_TOKEN=798DvzYBuwfGY5kjxzf2pCqJ NOCODB_TOKEN=zduIBacatyuOkAktr_5RPGJ_IkEjECaT-bbiLf8m \
+  node scripts/backfill.mjs 2026-06-08 2026-06-11
+
+git add dashboard/data
+git commit -m "metrics: atualizado"
+git push
+```
+
+Vercel republica em ~30s.
+
+> **Atenção:** os tokens NÃO vão no código (repo é público). Cola eles na frente do comando ou usa um `.env` local.
 
 ## Métricas calculadas
 
-**Funil:** disparos (split Reativação/Campanha), respondidos (lead enviou ≥1 mensagem), qualificados, desqualificados, suporte, transferidos + taxas de cada etapa.
+**Funil:** disparos (split Reativação/Campanha), respondidos, qualificados/desqualificados/suporte, transferidos + taxas de cada etapa.
 
-**Performance da IA:** tempo mediano até 1ª resposta da IA, mensagens por conversa (média/p50/p90), tempo até qualificação, mídias processadas (Whisper/Vision), conversas abandonadas (>48h sem resposta), `#reset` solicitados.
+**Performance da IA:** tempo mediano até 1ª resposta, mensagens/conversa (média/p50/p90), tempo até qualificação, mídias processadas (Whisper/Vision), conversas abandonadas, `#reset` solicitados.
 
 **Mix:** distribuição por Interesse e Conhecimento entre qualificados.
 
@@ -34,20 +47,8 @@ Dashboard estático de métricas do SDR IA da ATOM. Coleta via script Node.js, a
 
 1. Vercel — projeto `metricas-atom` (team `devops17`) ligado a este repo, rootDirectory=`dashboard`
 2. Cloudflare — `metricasatom.cognitaai.com.br` aponta via CNAME para `5ccd935d3ab9549b.vercel-dns-017.com` (Proxy DNS only)
-3. Cron — container Node rodando no EasyPanel. Setup em `cron/README.md`. **NÃO usar GitHub Actions** (runners ficam fora do BR e o servidor EasyPanel bloqueia esses IPs).
 
-## Rodar manualmente (local)
-
-```bash
-CHATWOOT_TOKEN=xxx NOCODB_TOKEN=yyy node scripts/backfill.mjs 2026-06-08 2026-06-11
-```
-Gera `dashboard/data/{daily,weekly}.json` localmente. Commitar + push = Vercel rebuilda em segundos.
-
-## Rodar manualmente (EasyPanel)
-
-Configure temporariamente `RUN_ON_START=range`, `RANGE_INI=YYYY-MM-DD`, `RANGE_FIM=YYYY-MM-DD` no app do EasyPanel e faça Redeploy. Mais detalhes em `cron/README.md`.
-
-## Variáveis de ambiente do script
+## Variáveis do script
 
 | Var | Default | Obrigatório |
 |---|---|---|
@@ -61,9 +62,8 @@ Configure temporariamente `RUN_ON_START=range`, `RANGE_INI=YYYY-MM-DD`, `RANGE_F
 
 ## Decisões
 
-- **Sem n8n** — pipeline 100% código, mais previsível e auditável
-- **Cron no EasyPanel** (não GitHub Actions) — servidor Hostinger bloqueia IPs Azure dos runners
-- **Hosting:** Vercel + commits do scheduler → autodeploy
-- **Auth:** público, slug não-listado
-- **Cadência:** diário (ter-sáb 07:00 BRT, processa o dia anterior) + semanal (seg 08:00 BRT, processa semana anterior)
-- **Sem histórico em DB próprio** — JSONs versionados no Git são o histórico. Auditável via `git log dashboard/data/`.
+- **Workflow manual** — roda comando, push, deploy. Sem cron container, sem GitHub Actions
+- **Hosting:** Vercel + commits manuais → autodeploy
+- **Tokens via env** — repo é público, não pode hardcodar
+- **Sem n8n** — pipeline 100% código
+- **Sem histórico em DB próprio** — JSONs versionados no Git são o histórico. Auditável via `git log dashboard/data/`

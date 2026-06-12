@@ -1,8 +1,0 @@
-{
-  "name": "atom-metrics-cron",
-  "private": true,
-  "type": "module",
-  "dependencies": {
-    "node-cron": "^3.0.3"
-  }
-}
