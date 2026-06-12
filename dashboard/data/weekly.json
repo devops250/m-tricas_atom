@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-06-11T22:59:34.679Z",
+  "gerado_em": "2026-06-12T02:33:54.982Z",
   "semana_inicio": "2026-06-08",
   "semana_fim": "2026-06-11",
   "periodo": "semanal",
@@ -8,24 +8,24 @@
     "disparos_reativacao": 1607,
     "disparos_campanha": 0,
     "falhas_envio": 0,
-    "respondidos": 341,
+    "respondidos": 340,
     "qualificados": 72,
     "desqualificados": 48,
     "suporte": 11,
     "transferidos": 87,
-    "taxa_resposta": 0.2122,
-    "taxa_qualificacao": 0.2111,
+    "taxa_resposta": 0.2116,
+    "taxa_qualificacao": 0.2118,
     "taxa_transferencia_disparos": 0.0541,
-    "taxa_transferencia_respostas": 0.2551
+    "taxa_transferencia_respostas": 0.2559
   },
   "performance_ia": {
     "tempo_medio_1a_resposta_seg": 18,
-    "msgs_por_conversa_media": 3.95,
+    "msgs_por_conversa_media": 3.91,
     "msgs_por_conversa_p90": 20,
     "tempo_medio_qualificacao_seg": 15959,
     "midias_processadas": 22,
     "taxa_fup_necessario": null,
-    "conversas_abandonadas": 40
+    "conversas_abandonadas": 36
   },
   "mix": {
     "interesse": {
@@ -52,11 +52,11 @@
       "semana_inicio": "2026-06-08",
       "semana_fim": "2026-06-11",
       "disparos": 1607,
-      "respondidos": 341,
+      "respondidos": 340,
       "qualificados": 72,
       "transferidos": 87,
-      "taxa_resposta": 0.2122,
-      "taxa_qualificacao": 0.2111,
+      "taxa_resposta": 0.2116,
+      "taxa_qualificacao": 0.2118,
       "taxa_transferencia_disparos": 0.0541
     }
   ]

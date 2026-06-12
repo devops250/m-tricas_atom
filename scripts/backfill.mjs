@@ -21,6 +21,24 @@ const env = {
 };
 for (const [k, v] of Object.entries(env)) if (!v) { console.error('Faltando env:', k); process.exit(1); }
 
+// Retry helper — EasyPanel SSL/Traefik oscila; tenta 5x com backoff
+async function fetchRetry(url, opts = {}, label = '') {
+  let lastErr;
+  for (let i = 1; i <= 5; i++) {
+    try {
+      const res = await fetch(url, opts);
+      if (!res.ok && res.status >= 500) throw new Error(`HTTP ${res.status}`);
+      return res;
+    } catch (e) {
+      lastErr = e;
+      const wait = i * 2000;
+      process.stderr.write(`  ⟳ retry ${i}/5 (${label}) em ${wait}ms — ${e.cause?.code || e.message}\n`);
+      await new Promise(r => setTimeout(r, wait));
+    }
+  }
+  throw lastErr;
+}
+
 const dayKey = (ts) => {
   // ts em segundos (Chatwoot) ou ISO string
   const d = typeof ts === 'number' ? new Date(ts * 1000) : new Date(ts);
@@ -38,7 +56,7 @@ async function fetchAllConversations() {
   const all = [];
   // Paginação Chatwoot: até encontrar conversas mais antigas que argInicio
   for (let page = 1; page <= 50; page++) {
-    const res = await fetch(`${url}?inbox_id=${env.CHATWOOT_INBOX}&page=${page}&assignee_type=all&status=all`, { headers });
+    const res = await fetchRetry(`${url}?inbox_id=${env.CHATWOOT_INBOX}&page=${page}&assignee_type=all&status=all`, { headers }, `convs p${page}`);
     if (!res.ok) throw new Error(`Chatwoot ${res.status}`);
     const json = await res.json();
     const payload = json.data?.payload || [];
@@ -57,10 +75,15 @@ async function fetchAllConversations() {
 
 async function fetchMessages(conversationId) {
   const url = `${env.CHATWOOT_HOST}/api/v1/accounts/${env.CHATWOOT_ACCOUNT}/conversations/${conversationId}/messages`;
-  const res = await fetch(url, { headers: { api_access_token: env.CHATWOOT_TOKEN } });
-  if (!res.ok) return [];
-  const json = await res.json();
-  return json.payload || [];
+  try {
+    const res = await fetchRetry(url, { headers: { api_access_token: env.CHATWOOT_TOKEN } }, `msgs ${conversationId}`);
+    if (!res.ok) return [];
+    const json = await res.json();
+    return json.payload || [];
+  } catch (e) {
+    process.stderr.write(`  ✗ msgs ${conversationId} desistiu: ${e.message}\n`);
+    return [];
+  }
 }
 
 // ────────────────────────────────────────────────────────────────────
@@ -72,7 +95,7 @@ async function fetchLeadsRange() {
   let offset = 0, pageSize = 200;
   while (offset < 5000) {
     const url = `${env.NOCODB_HOST}/api/v2/tables/${env.NOCODB_TABLE_ID}/records?limit=${pageSize}&offset=${offset}&sort=-CreatedAt`;
-    const res = await fetch(url, { headers });
+    const res = await fetchRetry(url, { headers }, `nocodb off=${offset}`);
     if (!res.ok) throw new Error(`NocoDB ${res.status}: ${await res.text()}`);
     const json = await res.json();
     const list = json.list || [];

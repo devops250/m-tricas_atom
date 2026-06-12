@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-06-11T22:59:34.679Z",
+  "gerado_em": "2026-06-12T02:33:54.982Z",
   "data": "2026-06-11",
   "periodo": "diario",
   "funil": {
@@ -58,13 +58,13 @@
     {
       "data": "2026-06-09",
       "disparos": 260,
-      "respondidos": 25,
+      "respondidos": 24,
       "qualificados": 13,
       "desqualificados": 9,
       "suporte": 1,
       "transferidos": 14,
-      "taxa_resposta": 0.0962,
-      "taxa_qualificacao": 0.52
+      "taxa_resposta": 0.0923,
+      "taxa_qualificacao": 0.5417
     },
     {
       "data": "2026-06-10",
