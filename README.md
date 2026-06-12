@@ -15,9 +15,11 @@ Dashboard estático de métricas do SDR IA da ATOM. Coleta via script Node.js, a
 │       └── weekly.json         # Snapshot da semana
 ├── scripts/
 │   └── backfill.mjs            # Coleta NocoDB + Chatwoot e gera os JSONs
-└── .github/workflows/
-    ├── metrics-daily.yml       # Cron diário (ter-sáb 07:00 BRT) — processa o dia anterior
-    └── metrics-weekly.yml      # Cron semanal (seg 08:00 BRT) — processa semana anterior
+└── cron/
+    ├── Dockerfile              # Container Node + node-cron
+    ├── scheduler.mjs           # Schedule diário + semanal, commita no Git
+    ├── package.json
+    └── README.md               # Instruções de deploy no EasyPanel
 ```
 
 ## Métricas calculadas
@@ -31,10 +33,8 @@ Dashboard estático de métricas do SDR IA da ATOM. Coleta via script Node.js, a
 ## Setup (já feito)
 
 1. Vercel — projeto `metricas-atom` (team `devops17`) ligado a este repo, rootDirectory=`dashboard`
-2. Cloudflare — `metricasatom.cognitaai.com.br` aponta via CNAME para `cname.vercel-dns.com` (Proxy DNS only)
-3. GitHub Secrets — adicionar em `Settings → Secrets and variables → Actions`:
-   - `CHATWOOT_TOKEN` — token API do Chatwoot (Account 1, Inbox 3)
-   - `NOCODB_TOKEN` — token API do NocoDB
+2. Cloudflare — `metricasatom.cognitaai.com.br` aponta via CNAME para `5ccd935d3ab9549b.vercel-dns-017.com` (Proxy DNS only)
+3. Cron — container Node rodando no EasyPanel. Setup em `cron/README.md`. **NÃO usar GitHub Actions** (runners ficam fora do BR e o servidor EasyPanel bloqueia esses IPs).
 
 ## Rodar manualmente (local)
 
@@ -43,9 +43,9 @@ CHATWOOT_TOKEN=xxx NOCODB_TOKEN=yyy node scripts/backfill.mjs 2026-06-08 2026-06
 ```
 Gera `dashboard/data/{daily,weekly}.json` localmente. Commitar + push = Vercel rebuilda em segundos.
 
-## Rodar manualmente (GitHub Actions)
+## Rodar manualmente (EasyPanel)
 
-`Actions → Métricas SDR — Diário → Run workflow` (com input opcional de data) ou `Métricas SDR — Semanal`.
+Configure temporariamente `RUN_ON_START=range`, `RANGE_INI=YYYY-MM-DD`, `RANGE_FIM=YYYY-MM-DD` no app do EasyPanel e faça Redeploy. Mais detalhes em `cron/README.md`.
 
 ## Variáveis de ambiente do script
 
@@ -61,8 +61,9 @@ Gera `dashboard/data/{daily,weekly}.json` localmente. Commitar + push = Vercel r
 
 ## Decisões
 
-- **Sem n8n** — pipeline 100% código + GitHub Actions, mais previsível e auditável
-- **Hosting:** Vercel + GitHub Actions commits → autodeploy
+- **Sem n8n** — pipeline 100% código, mais previsível e auditável
+- **Cron no EasyPanel** (não GitHub Actions) — servidor Hostinger bloqueia IPs Azure dos runners
+- **Hosting:** Vercel + commits do scheduler → autodeploy
 - **Auth:** público, slug não-listado
 - **Cadência:** diário (ter-sáb 07:00 BRT, processa o dia anterior) + semanal (seg 08:00 BRT, processa semana anterior)
 - **Sem histórico em DB próprio** — JSONs versionados no Git são o histórico. Auditável via `git log dashboard/data/`.
